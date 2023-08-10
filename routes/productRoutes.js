@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('./models/product');
+const Product = require('../models/product');
 const multer = require('multer');
 
 const upload = multer({
@@ -20,13 +20,22 @@ const upload = multer({
 // Create a new product
 router.post('/products', upload.single('image'), async (req, res) => {
     try {
-        const productData ={
-            ...req.body,
-            image: req.file.buffer  // Lấy dữ liệu ảnh từ buffer
-
-        };
+        const productData ={...req.body};
+        if (typeof productData.image === 'string') {
+            // Handle as a URL
+        } else if (Buffer.isBuffer(productData.image)) {
+            // Handle as binary image data
+            productData.image = req.file.buffer;  // Retrieve image data from buffer
+        } else {
+            // Handle other cases or throw an error
+            throw new Error("Invalid image data");
+        }
+        // chuyển giá trị
+        productData.price = parseFloat(productData.price);
         const product = new Product(productData);
         await product.save();
+        // Log the product data for debugging purposes
+        console.log("Product Data:", productData);
         res.status(201).send(product);
     } catch (error) {
         res.status(500).send(error);
@@ -57,14 +66,35 @@ router.get('/products/:id', async (req, res) => {
 });
 
 // Update a product
-router.put('/products/:id', async (req, res) => {
+router.put('/products/:id',upload.single('image'), async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const updates = { ...req.body };
+         // Handle the image data just like in the POST route
+         if (typeof updates.image === 'string') {
+            // Handle as a URL
+        } else if (Buffer.isBuffer(updates.image)) {
+            // Handle as binary image data
+            updates.image = req.file.buffer;
+        } else {
+            // Handle other cases or throw an error
+            throw new Error("Invalid image data");
+        }
+        updates.price = parseFloat(updates.price);
+        
+        console.log("Updating product with ID:", req.params.id);
+        console.log("Received updates:", updates);
+        const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+        console.log("Updated product:", product);
         if (!product) {
+        console.error("Error occurred:", error);
+
             return res.status(404).send();
         }
         res.send(product);
+       
+
     } catch (error) {
+        
         res.status(500).send(error);
     }
 });
@@ -78,6 +108,7 @@ router.delete('/products/:id', async (req, res) => {
         }
         res.send(product);
     } catch (error) {
+        console.error("Error occurred:", error);
         res.status(500).send(error);
     }
 });

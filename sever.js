@@ -11,7 +11,7 @@ mongoose.connect(uri, {
     useUnifiedTopology: true
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const userRouter = require('./routes/userRoutes');
 const categoryRouter = require('./routes/categoryRoutes');
 const productRouter = require('./routes/productRoutes');
@@ -56,5 +56,5 @@ app.use(orderDetailRouter);
 app.use(reviewRouter);
 
 app.listen(PORT, () => {
-    console.log('Server is running on port 3000');
+    console.log(`Server is running on port ${PORT}`);
 });
