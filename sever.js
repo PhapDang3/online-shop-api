@@ -11,7 +11,7 @@ mongoose.connect(uri, {
     useUnifiedTopology: true
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 const userRouter = require('./routes/userRoutes');
 const categoryRouter = require('./routes/categoryRoutes');
 const productRouter = require('./routes/productRoutes');
