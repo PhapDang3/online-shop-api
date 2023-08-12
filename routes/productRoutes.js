@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/product');
 const multer = require('multer');
+const { createResponse } = require('../models/responseHelper');
+
+
 
 const upload = multer({
     limits: {
@@ -36,9 +39,13 @@ router.post('/products', upload.single('image'), async (req, res) => {
         await product.save();
         // Log the product data for debugging purposes
         console.log("Product Data:", productData);
-        res.status(201).send(product);
+        // res.status(201).send(product);
+        res.status(201).json(createResponse('success', product, 'Product created successfully'));
     } catch (error) {
-        res.status(500).send(error);
+        // res.status(500).send(error);
+        res.status(500).json(createResponse('error', null, error.message));
+
+        
     }
 });
 
@@ -46,9 +53,15 @@ router.post('/products', upload.single('image'), async (req, res) => {
 router.get('/products', async (req, res) => {
     try {
         const products = await Product.find({}).populate('category');
-        res.send(products);
+        console.log("Products fetched:", products);
+        // res.send(products);
+        res.json(createResponse('success', products, 'Products fetched successfully'));
+
     } catch (error) {
-        res.status(500).send(error);
+             console.error("Error fetching products:", error);
+        // res.status(500).send(error);
+        res.status(500).json(createResponse('error', null, error.message));
+
     }
 });
 
@@ -56,12 +69,18 @@ router.get('/products', async (req, res) => {
 router.get('/products/:id', async (req, res) => {
     try {
         const product = await Product.findById(req.params.id).populate('category');
+        res.json(createResponse('success', product, null));
+
         if (!product) {
-            return res.status(404).send();
+            // return res.status(404).send();
+        res.status(404).json(createResponse('error', null, 'Product not found'));
+
         }
         res.send(product);
     } catch (error) {
-        res.status(500).send(error);
+        // res.status(500).send(error);
+        res.status(500).json(createResponse('error', null, error.message));
+
     }
 });
 
@@ -88,14 +107,18 @@ router.put('/products/:id',upload.single('image'), async (req, res) => {
         if (!product) {
         console.error("Error occurred:", error);
 
-            return res.status(404).send();
+            // return res.status(404).send();
+            res.status(404).json(createResponse('error', null, 'Product not found'));
+
         }
         res.send(product);
        
 
     } catch (error) {
         
-        res.status(500).send(error);
+        // res.status(500).send(error);
+        res.status(500).json(createResponse('error', null, error.message));
+
     }
 });
 
@@ -103,13 +126,19 @@ router.put('/products/:id',upload.single('image'), async (req, res) => {
 router.delete('/products/:id', async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id, req.body,{new: true, runValidators: true });
+        res.json(createResponse('success', product, 'Product deleted successfully'));
+
         if (!product) {
-            return res.status(404).send();
+            // return res.status(404).send();
+            res.status(404).json(createResponse('error', null, 'Product not found'));
+
         }
         res.send(product);
     } catch (error) {
         console.error("Error occurred:", error);
-        res.status(500).send(error);
+        // res.status(500).send(error);
+        res.status(500).json(createResponse('error', null, error.message));
+
     }
 });
 

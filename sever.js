@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
+mongoose.set('bufferCommands', false);
+// const winston = require('winston');
 const uri = "mongodb+srv://phapdn:123@cluster0.t8vv5ww.mongodb.net/dbShop?retryWrites=true&w=majority";
 
 const app = express();
@@ -9,9 +10,31 @@ const app = express();
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
+}).then(() => {
+    console.log("Connected to MongoDB");
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+         // Sử dụng logger:
+    
+    });
+}).catch((error) => {
+    console.error("Error connecting to MongoDB:", error);
 });
+// const logger = winston.createLogger({
+//     level: 'info',
+//     format: winston.format.simple(),
+//     transports: [
+//       new winston.transports.Console(),
+//       new winston.transports.File({ filename: 'server.log' })
+//     ]
+//   });
+  
+//   // Sử dụng logger:
+//   logger.info('Thông điệp thông thường');
+//   logger.error('Lỗi nào đó xảy ra!');
 
-const PORT = process.env.PORT || 3000;
+
 const userRouter = require('./routes/userRoutes');
 const categoryRouter = require('./routes/categoryRoutes');
 const productRouter = require('./routes/productRoutes');
@@ -55,6 +78,4 @@ app.use(orderRouter);
 app.use(orderDetailRouter);
 app.use(reviewRouter);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+
