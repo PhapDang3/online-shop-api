@@ -1,18 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 mongoose.set('bufferCommands', false);
 // const winston = require('winston');
 const uri = "mongodb+srv://phapdn:123@cluster0.t8vv5ww.mongodb.net/dbShop?retryWrites=true&w=majority";
 
 const app = express();
-
+app.use(bodyParser.json({ limit: '10mb' }));
 
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
     console.log("Connected to MongoDB");
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || 7000;
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
          // Sử dụng logger:
@@ -21,18 +22,7 @@ mongoose.connect(uri, {
 }).catch((error) => {
     console.error("Error connecting to MongoDB:", error);
 });
-// const logger = winston.createLogger({
-//     level: 'info',
-//     format: winston.format.simple(),
-//     transports: [
-//       new winston.transports.Console(),
-//       new winston.transports.File({ filename: 'server.log' })
-//     ]
-//   });
-  
-//   // Sử dụng logger:
-//   logger.info('Thông điệp thông thường');
-//   logger.error('Lỗi nào đó xảy ra!');
+
 
 
 const userRouter = require('./routes/userRoutes');
