@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 mongoose.set('bufferCommands', false);
 // const winston = require('winston');
-const uri = "mongodb+srv://phapdn:123@cluster0.t8vv5ww.mongodb.net/dbShop?retryWrites=true&w=majority";
+const uri = env.SEVER;
 
 const app = express();
 app.use(bodyParser.json({ limit: '50mb' }));
