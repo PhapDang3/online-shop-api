@@ -1,17 +1,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
+const bodyParser = require('body-parser');
+mongoose.set('bufferCommands', false);
+// const winston = require('winston');
 const uri = "mongodb+srv://phapdn:123@cluster0.t8vv5ww.mongodb.net/dbShop?retryWrites=true&w=majority";
 
 const app = express();
-
+app.use(bodyParser.json({ limit: '10mb' }));
 
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
+}).then(() => {
+    console.log("Connected to MongoDB");
+    const PORT = process.env.PORT || 7000;
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+         // Sử dụng logger:
+    
+    });
+}).catch((error) => {
+    console.error("Error connecting to MongoDB:", error);
 });
 
-const PORT = process.env.PORT || 3000;
+
+
 const userRouter = require('./routes/userRoutes');
 const categoryRouter = require('./routes/categoryRoutes');
 const productRouter = require('./routes/productRoutes');
@@ -55,6 +68,4 @@ app.use(orderRouter);
 app.use(orderDetailRouter);
 app.use(reviewRouter);
 
-app.listen(PORT, () => {
-    console.log('Server is running on port 3000');
-});
+
